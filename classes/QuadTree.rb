@@ -10,7 +10,7 @@ class QuadTree
     end
 
     def insert(point)
-        if (!point.inside_rect?(@boundary.to_array))
+        if (!point.inside_rect?(@boundary))
             return false
         end
         if @points.length() < @capacity
@@ -30,40 +30,36 @@ class QuadTree
     def subdivide()
         x = @boundary.x
         y = @boundary.y
-        half_width = @boundary.width / 2
-        half_height = @boundary.height / 2
+        child_size = @boundary.w / 2
  
-        nw = Rectangle.new(x, y + half_height, half_width, half_height)
+        nw = Rectangle.new(x, y + child_size, child_size, child_size)
         @northwest = QuadTree.new(nw, @capacity) 
-        ne = Rectangle.new(x + half_width, y + half_height, half_width, half_height)
+        ne = Rectangle.new(x + child_size, y + child_size, child_size, child_size)
         @northeast = QuadTree.new(ne, @capacity)
-        sw = Rectangle.new(x, y, half_width, half_height) 
+        sw = Rectangle.new(x, y, child_size, child_size) 
         @southwest = QuadTree.new(sw, @capacity)
-        se = Rectangle.new(x + half_width, y, half_width, half_height)
+        se = Rectangle.new(x + child_size, y, child_size, child_size)
         @southeast = QuadTree.new(se, @capacity)
 
         @divided = true
     end
 
     # range must be a Rectangle
-    def points_in_range(range, found)
-        if !@boundary.to_array.intersect_rect?(range.to_array)
+    def points_in_range(range, range_as_array, found)
+        
+        if !@boundary.intersect_rect?(range_as_array)
             return
         end
 
         # add all points from this quadtree if they are in the range
-        @points.each do |point|
-            if point.inside_rect?(range.to_array)
-                found << point
-            end
-        end
+        found.concat(@points.find_all{|point| point.inside_rect?(range_as_array)})
 
         # recursive calls on each of the 4 children if children exist
         if @divided
-            @northwest.points_in_range(range, found)
-            @northeast.points_in_range(range, found)
-            @southwest.points_in_range(range, found)
-            @southeast.points_in_range(range, found)
+            @northwest.points_in_range(range, range_as_array, found)
+            @northeast.points_in_range(range, range_as_array, found)
+            @southwest.points_in_range(range, range_as_array, found)
+            @southeast.points_in_range(range, range_as_array, found)
         end
     end
 

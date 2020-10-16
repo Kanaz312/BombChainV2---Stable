@@ -1,6 +1,7 @@
 class Point
+    include GTK::Geometry
     attr_sprite
-    attr_accessor :x_vel, :y_vel, :truex, :truey, :w, :h, :x, :y, :r, :g, :b, :a
+    attr_accessor :x_vel, :y_vel, :truex, :truey, :w, :h, :x, :y, :r, :g, :b, :a, :path, :collider, :collider_array
 
     #note that x/y is the drawing position, and truex/truey are the center of the point
     def initialize(x, y, args)
@@ -18,6 +19,8 @@ class Point
         @b = 255
         @a = 2558
         @path = 'sprites/black.png'
+        @collider = Rectangle.new(@truex - (@w * 3 / 2), @truey - (@h * 3 / 2), @w * 3, @h * 3)
+        @collider_offset = (@w * 3 / 2)
         args.outputs.static_sprites << self
     end
 
@@ -52,6 +55,8 @@ class Point
             @truey += @y_vel
             @y += @y_vel
         end
+        
+        @collider.move_to(@truex - @collider_offset, @truey - @collider_offset)
     end
 
     def inside_rect?(rect)
@@ -59,7 +64,7 @@ class Point
     end
 
     def intersecting?(other)
-        if [@x, @y, @w, @h].intersect_rect?([other.x, other.y, other.w, other.h])
+        if self.intersect_rect?(other)
             return true
         else
             return false
@@ -96,21 +101,31 @@ end
 
 
 class Rectangle
-  
-    attr_accessor :x, :y, :width, :height
-    def initialize(x, y, width, height)
+    include GTK::Geometry
+    attr_accessor :x, :y, :w, :h, :right, :left, :top, :bottom
+    def initialize(x, y, w, h)
         @x = x 
         @y = y
-        @width = width
-        @height = height
+        @w= w
+        @h = h
+        @right = @x + @w
+        @left = @x
+        @top = @y + @h
+        @bottom = @y
+
+    end
+
+    def move_to(x, y)
+        @x = x
+        @y = y
     end
 
     def to_array
-        return [@x, @y, @width, @height]
+        return [@x, @y, @w, @h]
     end
 
     def serialize
-        hash = {x: @x, y: @y, width: @width, height: @height}
+        hash = {x: @x, y: @y, w: @w, h: @h}
         return hash
     end
     
