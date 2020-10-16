@@ -101,7 +101,8 @@ end
 
 
 class Rectangle
-    include GTK::Geometry
+    # include GTK::Geometry
+    attr_sprite
     attr_accessor :x, :y, :w, :h, :right, :left, :top, :bottom
     def initialize(x, y, w, h)
         @x = x 
@@ -112,12 +113,19 @@ class Rectangle
         @left = @x
         @top = @y + @h
         @bottom = @y
-
     end
 
     def move_to(x, y)
         @x = x
         @y = y
+        @right = x + @w
+        @left = x
+        @top = y + @h
+        @bottom = y
+    end
+
+    def to_hash
+        return {x: @x, y: @y, w: @w, h: @h}
     end
 
     def to_array
