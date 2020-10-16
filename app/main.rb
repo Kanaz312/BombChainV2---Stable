@@ -22,9 +22,8 @@ def tick args
 end
 
 def init args
-    args.state.capacity ||= 1
     boundary ||= Rectangle.new(0, 0, 1280, 720)
-    quad_tree ||= QuadTree.new(boundary, args.state.capacity)
+    quad_tree ||= QuadTree.new(boundary)
     args.state.tree ||= quad_tree
     args.state.drawing ||= false
     args.state.points ||= []
@@ -41,7 +40,7 @@ def init args
             args.state.speed_values << -i
         end
     end
-    100.times do |i|
+    500.times do |i|
         point = Point.new(10 + rand(1260), 10 + rand(700), args)
         quad_tree.insert(point)
         args.state.points << point
@@ -61,7 +60,7 @@ def update_points(points, tree, args)
     points.each do |point|
         point.path = "sprites/black.png"
         point.move
-        args.outputs.borders << point.collider
+        # args.outputs.borders << point.collider
         possible_points.clear()
         # start_time = Time.now
         tree.points_in_range(point.collider, possible_points, args)

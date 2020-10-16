@@ -2,20 +2,19 @@ require "classes/Geometry.rb"
 
 class QuadTree
   
-    def initialize(boundary, capacity)
+    def initialize(boundary)
         @boundary = boundary
-        @capacity = capacity
         @divided = false
-        @points = []
+        @point = false
     end
 
     def insert(point)
-        if (!point.inside_rect?(@boundary))
+        if !(point.inside_rect?(@boundary))
             return false
         end
 
-        if @points.length() < @capacity
-            @points.append(point)
+        if !@point
+            @point = point
             return true
         else
             if !@divided
@@ -31,13 +30,13 @@ class QuadTree
     def subdivide()
         x = @boundary.x
         y = @boundary.y
-        capacity = @capacity
-        child_size = @boundary.w / 2
+        child_width = @boundary.w / 2
+        child_height = @boundary.h / 2
  
-        @northwest = QuadTree.new(Rectangle.new(x, y + child_size, child_size, child_size), capacity) 
-        @northeast = QuadTree.new(Rectangle.new(x + child_size, y + child_size, child_size, child_size), capacity) 
-        @southwest = QuadTree.new(Rectangle.new(x, y, child_size, child_size), capacity)
-        @southeast = QuadTree.new(Rectangle.new(x + child_size, y, child_size, child_size), capacity)
+        @northwest = QuadTree.new(Rectangle.new(x, y + child_height, child_width, child_height)) 
+        @northeast = QuadTree.new(Rectangle.new(x + child_width, y + child_height, child_width, child_height)) 
+        @southwest = QuadTree.new(Rectangle.new(x, y, child_width, child_height))
+        @southeast = QuadTree.new(Rectangle.new(x + child_width, y, child_width, child_height))
 
         @divided = true
     end
@@ -50,7 +49,9 @@ class QuadTree
         end
 
         # add all points from this quadtree if they are in the range
-        found.concat(@points.find_all{|point| point.inside_rect?(range)})
+        if @point && @point.inside_rect?(range)
+            found << @point
+        end
         # args.state.total_checks += @points.length
         # recursive calls on each of the 4 children if children exist
         if @divided
@@ -63,7 +64,7 @@ class QuadTree
 
     def clear
         @divided = false
-        @points = []
+        @point =false
         @northwest = nil
         @northeast = nil
         @southwest = nil
@@ -89,7 +90,7 @@ class QuadTree
     end
 
     def serialize
-        hash = {boundary: @boundary, capacity: @capacity, points: @points.length()}
+        hash = {boundary: @boundary, capacity: @capacity, points: @point}
         return hash
     end
 

@@ -60,7 +60,7 @@ class Point
     end
 
     def inside_rect?(rect)
-        return [@truex, @truey].inside_rect?(rect)
+        return @truex >= rect.left && @truex <= rect.right && @truey >= rect.bottom && @truey <= rect.top
     end
 
     def intersecting?(other)
