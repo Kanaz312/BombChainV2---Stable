@@ -9,22 +9,29 @@ class QuadTree
     end
 
     def insert(point)
-        if !(point.inside_rect?(@boundary))
+        if !(point.intersect_rect?(@boundary))
             return false
         end
 
         if !@point
             @point = point
             return true
+        elsif point > @point
+            smaller = @point
+            @point = point
         else
-            if !@divided
-                subdivide()
-            end
-
-            if @northeast.insert(point) || @northwest.insert(point) || @southwest.insert(point) || @southeast.insert(point)
-                return true
-            end
+            smaller = point
         end
+
+        if !@divided
+            subdivide()
+        end
+
+        @northeast.insert(smaller)
+        @northwest.insert(smaller)
+        @southwest.insert(smaller)
+        @southeast.insert(smaller)
+        return true
     end
 
     def subdivide()
@@ -49,7 +56,7 @@ class QuadTree
         end
 
         # add all points from this quadtree if they are in the range
-        if @point && @point.inside_rect?(range)
+        if @point && @point.intersect_rect?(range)
             found << @point
         end
         # args.state.total_checks += @points.length

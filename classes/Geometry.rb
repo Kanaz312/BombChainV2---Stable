@@ -1,7 +1,7 @@
 class Point
     include GTK::Geometry
     attr_sprite
-    attr_accessor :x_vel, :y_vel, :truex, :truey, :w, :h, :x, :y, :r, :g, :b, :a, :path, :collider, :collider_array
+    attr_accessor :x_vel, :y_vel, :truex, :truey, :w, :h, :x, :y, :r, :g, :b, :a, :path, :collider, :collider_offset
 
     #note that x/y is the drawing position, and truex/truey are the center of the point
     def initialize(x, y, args)
@@ -10,8 +10,9 @@ class Point
         @y_vel = speed_values[rand(speed_values.length)]
         @truex = x - @x_vel
         @truey = y - @y_vel
-        @w = 10
-        @h = 10
+        size_modifier = 1 + rand(40)
+        @w = 1 * size_modifier
+        @h = 1 * size_modifier
         @x = x - (@w / 2)
         @y = y - (@h / 2)
         @r = 255
@@ -70,6 +71,14 @@ class Point
             return false
         end
             
+    end
+
+    def >(other)
+        if !other
+            return true
+        else
+            return @w > other.w
+        end
     end
 
     def ==(other)

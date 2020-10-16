@@ -40,7 +40,7 @@ def init args
             args.state.speed_values << -i
         end
     end
-    500.times do |i|
+    200.times do |i|
         point = Point.new(10 + rand(1260), 10 + rand(700), args)
         quad_tree.insert(point)
         args.state.points << point
